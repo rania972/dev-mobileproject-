@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5">
+
+    <!-- En-tête -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Historique des trajets"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:padding="16dp"
+        android:background="#FFFFFF"/>
+
+    <!-- Filtres -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center"
+        android:background="#FFFFFF">
+
+        <Button
+            android:id="@+id/btnFilterMonth"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="📅 Mois"
+            android:textSize="14sp"
+            android:layout_margin="4dp"/>
+
+        <Button
+            android:id="@+id/btnFilterTransport"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="🚌 Type"
+            android:textSize="14sp"
+            android:layout_margin="4dp"/>
+
+        <Button
+            android:id="@+id/btnFilterDestination"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="📍 Destination"
+            android:textSize="14sp"
+            android:layout_margin="4dp"/>
+    </LinearLayout>
+
+    <!-- Liste des trajets -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="8dp">
+
+        <LinearLayout
+            android:id="@+id/containerTrajets"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
+    </ScrollView>
+
+    <!-- Bouton refaire trajet -->
+    <Button
+        android:id="@+id/btnRefaireTrajet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Refaire ce trajet"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#2196F3"
+        android:layout_margin="16dp"
+        android:padding="16dp"/>
+</LinearLayout>

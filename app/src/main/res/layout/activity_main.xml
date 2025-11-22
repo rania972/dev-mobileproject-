@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F9FA">
+
+    <!-- Spacing at top -->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="32dp" />
+
+    <!-- Search bar & filter -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="#FFFFFF"
+        android:padding="12dp"
+        android:layout_marginBottom="4dp"
+        android:elevation="2dp">
+
+        <EditText
+            android:id="@+id/searchEdit"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:hint="Rechercher une ligne ou un arrêt"
+            android:background="@android:color/transparent"
+            android:textColorHint="#888"
+            android:textSize="16sp"
+            android:padding="10dp"/>
+
+        <ImageView
+            android:id="@+id/searchIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/recherche"/>
+    </LinearLayout>
+
+    <!-- Location selector BELOW search bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="8dp"
+        android:layout_marginBottom="6dp"
+        android:gravity="center_vertical"
+        android:elevation="1dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lieu :"
+            android:textColor="#222"
+            android:textSize="15sp"
+            android:layout_marginEnd="8dp"/>
+
+        <Spinner
+            android:id="@+id/locationSpinner"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="@android:drawable/btn_dropdown"/>
+    </LinearLayout>
+
+    <!-- Tabs -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:tabTextColor="#888"
+        app:tabSelectedTextColor="#2196F3"
+        app:tabIndicatorColor="#2196F3">
+        <com.google.android.material.tabs.TabItem android:text="Liste"/>
+    </com.google.android.material.tabs.TabLayout>
+
+    <!-- Bus list -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/busList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#F8F9FA"/>
+
+    <!-- Bottom navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:menu="@menu/bottom_menu"/>
+</LinearLayout>

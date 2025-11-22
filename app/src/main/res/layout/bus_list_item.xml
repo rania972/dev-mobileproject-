@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content" android:background="#FFF"
+    android:elevation="2dp" android:layout_margin="8dp">
+
+    <!-- Compact info row -->
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical" android:padding="12dp">
+        <ImageView android:id="@+id/busIcon" android:layout_width="40dp" android:layout_height="40dp"
+            android:src="@drawable/ic_bus" android:scaleType="centerInside" android:contentDescription="Bus"/>
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="12dp">
+            <TextView android:id="@+id/busNumber" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:textStyle="bold"
+                android:textSize="16sp" android:textColor="#222"/>
+            <TextView android:id="@+id/busRoute" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#888"/>
+        </LinearLayout>
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:orientation="vertical" android:gravity="end">
+            <TextView android:id="@+id/busTime" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:textStyle="bold"
+                android:textSize="14sp" android:textColor="#111"/>
+            <TextView android:id="@+id/busStatus" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:textSize="12sp"
+                android:textColor="#4CAF50"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Expandable details section -->
+    <LinearLayout android:id="@+id/busDetails" android:orientation="vertical"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:background="#F8F9FA" android:padding="16dp" android:visibility="gone">
+        <TextView android:id="@+id/busStops" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:textColor="#333"
+            android:textSize="13sp"/>
+        <TextView android:id="@+id/busDuration" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:textColor="#333"
+            android:textSize="13sp"/>
+        <!-- MapView, hidden at first, shown when expanded -->
+        <org.osmdroid.views.MapView android:id="@+id/busMap"
+            android:layout_width="match_parent" android:layout_height="180dp"
+            android:layout_marginTop="10dp" android:background="#CCC" android:visibility="gone"/>
+    </LinearLayout>
+</LinearLayout>

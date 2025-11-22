@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Wasalni</string>
+
+    <string-array name="locations">
+        <item>Aujourd\'hui</item>
+        <item>Demain</item>
+        <item>Cette semaine</item>
+    </string-array>
+</resources>
