@@ -1,52 +1,117 @@
 package com.example.waslniiii;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.widget.Button;
+import android.preference.PreferenceManager;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+
 public class Acuielle extends AppCompatActivity {
+
+    private MapView map;
+    private MyLocationNewOverlay locationOverlay;
+    private static final int REQUEST_LOCATION = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // ✅ CONFIGURATION OSMDROID (IMPORTANT!)
+        Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
+        Configuration.getInstance().setUserAgentValue(getPackageName());
+
         setContentView(R.layout.acuielle);
 
-        // Récupération des boutons
-        Button buttonTaxi = findViewById(R.id.button2);
-        Button buttonBus = findViewById(R.id.button9);
-        Button buttonTrajet = findViewById(R.id.button10);
-        Button buttonHistorique = findViewById(R.id.button8);
+        map = findViewById(R.id.map);
 
-        // 🔹 Taille désirée des icônes (en pixels)
-        int iconSize = 150; // tu peux augmenter cette valeur (ex: 200 pour encore plus grand)
+        // ✅ Configuration de la carte
+        map.setTileSource(TileSourceFactory.MAPNIK);
+        map.setMultiTouchControls(true);
 
-        // 🔹 Appliquer les icônes redimensionnées
-        setButtonIcon(buttonTaxi, R.drawable.icon_taxi, iconSize);
-        setButtonIcon(buttonBus, R.drawable.icon_bus, iconSize);
-        setButtonIcon(buttonTrajet, R.drawable.icon_trajet, iconSize);
-        setButtonIcon(buttonHistorique, R.drawable.icon_historique, iconSize);
+        // ❌ Masquer les boutons +/-
+        map.setBuiltInZoomControls(false);
+        map.getZoomController().setVisibility(
+                org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER
+        );
+
+        // ✅ Zoom par défaut
+        map.getController().setZoom(15.0);
+
+        // Vérification permission
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_LOCATION);
+        } else {
+            activerLocalisation();
+        }
     }
 
-    // Fonction pour redimensionner une icône vectorielle et l’appliquer à un bouton
-    private void setButtonIcon(Button button, int drawableId, int sizePx) {
-        Drawable drawable = ContextCompat.getDrawable(this, drawableId);
-        if (drawable != null) {
-            Bitmap bitmap = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bitmap);
-            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-            drawable.draw(canvas);
+    private void activerLocalisation() {
+        // Overlay de localisation
+        locationOverlay = new MyLocationNewOverlay(
+                new GpsMyLocationProvider(this), map);
+        locationOverlay.enableMyLocation();
+        locationOverlay.enableFollowLocation();
 
-            // Créer un drawable bitmap redimensionné
-            BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), bitmap);
+        map.getOverlays().add(locationOverlay);
 
-            // Définir l’icône au-dessus du texte (gravity top)
-            button.setCompoundDrawablesWithIntrinsicBounds(null, bitmapDrawable, null, null);
+        // Centrer sur la position dès qu'elle est trouvée
+        locationOverlay.runOnFirstFix(() -> runOnUiThread(() -> {
+            IGeoPoint myPos = locationOverlay.getMyLocation();
+            if (myPos != null) {
+                map.getController().setZoom(16.0);
+                map.getController().animateTo((GeoPoint) myPos);
+            }
+        }));
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_LOCATION &&
+                grantResults.length > 0 &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            activerLocalisation();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (map != null) {
+            map.onResume();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (map != null) {
+            map.onPause();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (map != null) {
+            map.onDetach();
         }
     }
 }

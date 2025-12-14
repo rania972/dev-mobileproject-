@@ -33,7 +33,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 }
-
 dependencies {
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -45,6 +44,6 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
     implementation("org.osmdroid:osmdroid-android:6.1.18")
-
-
+    implementation("androidx.preference:preference:1.2.1")
+    // CardView est déjà inclus dans Material, pas besoin de l'ajouter
 }
