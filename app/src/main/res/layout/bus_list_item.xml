@@ -8,7 +8,7 @@
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
         android:orientation="horizontal" android:gravity="center_vertical" android:padding="12dp">
         <ImageView android:id="@+id/busIcon" android:layout_width="40dp" android:layout_height="40dp"
-            android:src="@drawable/ic_bus" android:scaleType="centerInside" android:contentDescription="Bus"/>
+            android:src="@drawable/bus" android:scaleType="centerInside" android:contentDescription="Bus"/>
         <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
             android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="12dp">
             <TextView android:id="@+id/busNumber" android:layout_width="wrap_content"

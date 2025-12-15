@@ -7,18 +7,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Polyline;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
+    // ---------- Model ----------
     public static class Bus {
         public String number, route, time, status, stops, duration;
         public int color;
@@ -47,9 +54,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         Configuration.getInstance().setUserAgentValue(getPackageName());
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);  // uses activity_main.xml
 
-        // Real Sousse route coordinates (sample)
+        // ---------- Static sample data ----------
         List<GeoPoint> sahloulRoute = Arrays.asList(
                 new GeoPoint(35.824822, 10.596491), // Sahloul
                 new GeoPoint(35.826200, 10.616969), // Jawhara
@@ -77,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
         );
         displayedBuses = new ArrayList<>(allBuses);
 
+        // ---------- Spinner filter ----------
         Spinner locationSpinner = findViewById(R.id.locationSpinner);
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_item,
@@ -87,24 +95,36 @@ public class MainActivity extends AppCompatActivity {
         locationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                 String selected = parent.getItemAtPosition(pos).toString();
-                filterBuses(selected);
+                filterByLocation(selected);
             }
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
+        // ---------- RecyclerView ----------
         RecyclerView busList = findViewById(R.id.busList);
         busList.setLayoutManager(new LinearLayoutManager(this));
         adapter = new BusAdapter(displayedBuses);
         busList.setAdapter(adapter);
+
+        // ---------- Search bar ----------
+        EditText searchInput = findViewById(R.id.searchInput);   // from activity_main.xml
+        ImageView searchIcon = findViewById(R.id.searchIcon);
+
+        searchIcon.setOnClickListener(v -> {
+            String query = searchInput.getText().toString().trim();
+            searchBuses(query);
+        });
     }
 
-    private void filterBuses(String selected) {
+    // Filter by spinner location
+    private void filterByLocation(String selected) {
         displayedBuses.clear();
         if (selected.equals("Tous")) {
             displayedBuses.addAll(allBuses);
         } else {
             for (Bus b : allBuses) {
-                if (b.route.contains(selected) || b.stops.contains(selected)) {
+                if ((b.route != null && b.route.contains(selected)) ||
+                        (b.stops != null && b.stops.contains(selected))) {
                     displayedBuses.add(b);
                 }
             }
@@ -112,15 +132,39 @@ public class MainActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
+    // Search by text (number, route, stops, status, duration)
+    private void searchBuses(String query) {
+        displayedBuses.clear();
+
+        if (query.isEmpty()) {
+            displayedBuses.addAll(allBuses);
+        } else {
+            String q = query.toLowerCase(Locale.ROOT);
+            for (Bus b : allBuses) {
+                if ((b.number   != null && b.number.toLowerCase(Locale.ROOT).contains(q)) ||
+                        (b.route    != null && b.route.toLowerCase(Locale.ROOT).contains(q))  ||
+                        (b.stops    != null && b.stops.toLowerCase(Locale.ROOT).contains(q))  ||
+                        (b.status   != null && b.status.toLowerCase(Locale.ROOT).contains(q)) ||
+                        (b.duration != null && b.duration.toLowerCase(Locale.ROOT).contains(q))) {
+                    displayedBuses.add(b);
+                }
+            }
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    // ---------- Adapter ----------
     class BusAdapter extends RecyclerView.Adapter<BusAdapter.BusHolder> {
-        private List<Bus> data;
-        BusAdapter(List<Bus> d) { data=d; }
+        private final List<Bus> data;
+        BusAdapter(List<Bus> d) { data = d; }
 
         @Override
         public BusHolder onCreateViewHolder(ViewGroup p, int v) {
-            View row = LayoutInflater.from(p.getContext()).inflate(R.layout.bus_list_item, p, false);
+            View row = LayoutInflater.from(p.getContext())
+                    .inflate(R.layout.bus_list_item, p, false);
             return new BusHolder(row);
         }
+
         @Override
         public void onBindViewHolder(BusHolder h, int i) {
             Bus b = data.get(i);
@@ -130,21 +174,20 @@ public class MainActivity extends AppCompatActivity {
             h.busStatus.setText(b.status);
             h.busStatus.setTextColor(b.color);
 
-            // Show bus photo in the icon
-            h.busIcon.setImageResource(R.drawable.ic_bus); // your bus image file
-            h.busIcon.clearColorFilter(); // removes any unwanted coloring
+            h.busIcon.setImageResource(R.drawable.bus); // your drawable
+            h.busIcon.clearColorFilter();
 
-            h.busStops.setText("Arrêts: "+b.stops);
-            h.busDuration.setText("Durée: "+b.duration);
+            h.busStops.setText("Arrêts: " + b.stops);
+            h.busDuration.setText("Durée: " + b.duration);
             h.busDetails.setVisibility(View.GONE);
             h.busMap.setVisibility(View.GONE);
 
             h.itemView.setOnClickListener(v -> {
                 boolean show = h.busDetails.getVisibility() != View.VISIBLE;
-                h.busDetails.setVisibility(show?View.VISIBLE:View.GONE);
-                h.busMap.setVisibility(show?View.VISIBLE:View.GONE);
+                h.busDetails.setVisibility(show ? View.VISIBLE : View.GONE);
+                h.busMap.setVisibility(show ? View.VISIBLE : View.GONE);
 
-                if(show) {
+                if (show) {
                     h.busMap.setTileSource(TileSourceFactory.MAPNIK);
                     h.busMap.getController().setZoom(14);
                     h.busMap.getOverlayManager().clear();
@@ -154,12 +197,12 @@ public class MainActivity extends AppCompatActivity {
                         Polyline line = new Polyline();
                         line.setPoints(b.routePoints);
 
-                        // Style the line using getPaint()
                         Paint paint = line.getPaint();
                         paint.setColor(Color.parseColor("#1976D2"));
                         paint.setStrokeWidth(14f);
                         paint.setStyle(Paint.Style.STROKE);
-                        paint.setPathEffect(new android.graphics.DashPathEffect(new float[]{40, 20}, 0));
+                        paint.setPathEffect(
+                                new android.graphics.DashPathEffect(new float[]{40, 20}, 0));
                         paint.setAlpha(210);
                         paint.setAntiAlias(true);
 
@@ -168,8 +211,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+
         @Override
         public int getItemCount() { return data.size(); }
+
         class BusHolder extends RecyclerView.ViewHolder {
             TextView busNumber, busRoute, busTime, busStatus, busStops, busDuration;
             ImageView busIcon;
@@ -177,15 +222,15 @@ public class MainActivity extends AppCompatActivity {
             MapView busMap;
             BusHolder(View v) {
                 super(v);
-                busNumber = v.findViewById(R.id.busNumber);
-                busRoute = v.findViewById(R.id.busRoute);
-                busTime = v.findViewById(R.id.busTime);
-                busStatus = v.findViewById(R.id.busStatus);
-                busStops = v.findViewById(R.id.busStops);
+                busNumber   = v.findViewById(R.id.busNumber);
+                busRoute    = v.findViewById(R.id.busRoute);
+                busTime     = v.findViewById(R.id.busTime);
+                busStatus   = v.findViewById(R.id.busStatus);
+                busStops    = v.findViewById(R.id.busStops);
                 busDuration = v.findViewById(R.id.busDuration);
-                busIcon = v.findViewById(R.id.busIcon);
-                busDetails = v.findViewById(R.id.busDetails);
-                busMap = v.findViewById(R.id.busMap);
+                busIcon     = v.findViewById(R.id.busIcon);
+                busDetails  = v.findViewById(R.id.busDetails);
+                busMap      = v.findViewById(R.id.busMap);
             }
         }
     }

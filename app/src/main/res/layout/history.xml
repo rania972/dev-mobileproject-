@@ -1,83 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#F5F7FB"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#F5F5F5">
+    android:layout_height="match_parent">
 
-    <!-- En-tête -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Historique des trajets"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="#000000"
-        android:gravity="center"
-        android:padding="16dp"
-        android:background="#FFFFFF"/>
-
-    <!-- Filtres -->
+    <!-- Header (Title + Filters) -->
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/header"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:gravity="center"
-        android:background="#FFFFFF">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <Button
-            android:id="@+id/btnFilterMonth"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="📅 Mois"
-            android:textSize="14sp"
-            android:layout_margin="4dp"/>
-
-        <Button
-            android:id="@+id/btnFilterTransport"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="🚌 Type"
-            android:textSize="14sp"
-            android:layout_margin="4dp"/>
-
-        <Button
-            android:id="@+id/btnFilterDestination"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="📍 Destination"
-            android:textSize="14sp"
-            android:layout_margin="4dp"/>
-    </LinearLayout>
-
-    <!-- Liste des trajets -->
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="8dp">
+        <TextView
+            android:id="@+id/tvTitle"
+            android:text="Historige des trajets"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:textColor="#0D1B3E"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
         <LinearLayout
-            android:id="@+id/containerTrajets"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"/>
-    </ScrollView>
+            android:layout_height="wrap_content">
 
-    <!-- Bouton refaire trajet -->
-    <Button
-        android:id="@+id/btnRefaireTrajet"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Refaire ce trajet"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#2196F3"
-        android:layout_margin="16dp"
-        android:padding="16dp"/>
-</LinearLayout>
+            <Button
+                android:id="@+id/btnFilterMonth"
+                android:text="Mois"
+                android:backgroundTint="#E8EDF7"
+                android:textColor="#0D1B3E"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="40dp"/>
+
+            <Button
+                android:id="@+id/btnFilterTransport"
+                android:text="Type de transport"
+                android:backgroundTint="#E8EDF7"
+                android:textColor="#0D1B3E"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="40dp"/>
+
+            <Button
+                android:id="@+id/btnFilterDestination"
+                android:text="Destination"
+                android:backgroundTint="#E8EDF7"
+                android:textColor="#0D1B3E"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="40dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Sticky bottom action bar -->
+    <LinearLayout
+        android:id="@+id/bottomBar"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:background="#FFFFFF"
+        android:elevation="8dp"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/btnRefaireTrajet"
+            android:text="REFARE CE TRAJET"
+            android:textStyle="bold"
+            android:backgroundTint="#1D58D6"
+            android:textColor="#FFFFFF"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+
+    <!-- RecyclerView: anchored between header and bottom bar -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvTrips"
+        android:clipToPadding="false"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintBottom_toTopOf="@id/bottomBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
