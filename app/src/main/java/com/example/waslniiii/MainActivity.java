@@ -2,6 +2,7 @@ package com.example.waslniiii;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -38,12 +39,76 @@ public class MainActivity extends AppCompatActivity {
         passwordInput = findViewById(R.id.et_motpasse);
         loginBtn = findViewById(R.id.button);
 
-        loginBtn.setOnClickListener(v -> loginTaxi());
+        loginBtn.setOnClickListener(v -> {
+            if (validateInputs()) {
+                loginTaxi();
+            }
+        });
+    }
+
+    private boolean validateInputs() {
+        String email = emailInput.getText().toString().trim();
+        String password = passwordInput.getText().toString().trim();
+
+        // Vérifier si l'email est vide
+        if (email.isEmpty()) {
+            emailInput.setError("L'email est obligatoire");
+            emailInput.requestFocus();
+            return false;
+        }
+
+        // Vérifier le format de l'email (sauf si contient "client" ou "taxi")
+        if (!email.toLowerCase().contains("client") &&
+                !email.toLowerCase().contains("taxi") &&
+                !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailInput.setError("Format d'email invalide");
+            emailInput.requestFocus();
+            return false;
+        }
+
+        // Vérifier si le mot de passe est vide
+        if (password.isEmpty()) {
+            passwordInput.setError("Le mot de passe est obligatoire");
+            passwordInput.requestFocus();
+            return false;
+        }
+
+        // Vérifier la longueur minimale du mot de passe (sauf si contient "client" ou "taxi")
+        if (!password.toLowerCase().contains("client") &&
+                !password.toLowerCase().contains("taxi") &&
+                password.length() < 6) {
+            passwordInput.setError("Le mot de passe doit contenir au moins 6 caractères");
+            passwordInput.requestFocus();
+            return false;
+        }
+
+        return true;
     }
 
     private void loginTaxi() {
         String email = emailInput.getText().toString().trim();
         String password = passwordInput.getText().toString().trim();
+
+        // ✅ VÉRIFICATION MOT "CLIENT" - Redirection directe vers Acuielle
+        if (email.toLowerCase().contains("client") || password.toLowerCase().contains("client")) {
+            Toast.makeText(MainActivity.this, "Bienvenue client !", Toast.LENGTH_SHORT).show();
+            Intent i = new Intent(MainActivity.this, Acuielle.class);
+            startActivity(i);
+            finish();
+            return; // Arrêter l'exécution ici
+        }
+
+        // ✅ VÉRIFICATION MOT "TAXI" - Redirection directe vers SelectionCourse
+        if (email.toLowerCase().contains("taxi") || password.toLowerCase().contains("taxi")) {
+            Toast.makeText(MainActivity.this, "Bienvenue chauffeur !", Toast.LENGTH_SHORT).show();
+            Intent i = new Intent(MainActivity.this, SelectionCourse.class);
+            startActivity(i);
+            finish();
+            return; // Arrêter l'exécution ici
+        }
+
+        // Désactiver le bouton pendant la connexion
+        loginBtn.setEnabled(false);
 
         new Thread(() -> {
             try {
@@ -52,6 +117,8 @@ public class MainActivity extends AppCompatActivity {
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoOutput(true);
+                conn.setConnectTimeout(10000); // Timeout de 10 secondes
+                conn.setReadTimeout(10000);
 
                 String data = "email=" + email + "&password=" + password;
 
@@ -73,24 +140,25 @@ public class MainActivity extends AppCompatActivity {
                 String status = json.getString("status");
 
                 if (status.equals("success")) {
-
                     runOnUiThread(() -> {
                         Toast.makeText(MainActivity.this, "Bienvenue chauffeur !", Toast.LENGTH_SHORT).show();
                         Intent i = new Intent(MainActivity.this, SelectionCourse.class);
                         startActivity(i);
+                        finish(); // Fermer l'activité de connexion
                     });
-
                 } else {
-                    runOnUiThread(() ->
-                            Toast.makeText(MainActivity.this, "Email ou mot de passe incorrect", Toast.LENGTH_SHORT).show()
-                    );
+                    runOnUiThread(() -> {
+                        Toast.makeText(MainActivity.this, "Email ou mot de passe incorrect", Toast.LENGTH_SHORT).show();
+                        loginBtn.setEnabled(true); // Réactiver le bouton
+                    });
                 }
 
             } catch (Exception e) {
                 e.printStackTrace();
-                runOnUiThread(() ->
-                        Toast.makeText(MainActivity.this, "Erreur de connexion", Toast.LENGTH_SHORT).show()
-                );
+                runOnUiThread(() -> {
+                    Toast.makeText(MainActivity.this, "Erreur de connexion au serveur", Toast.LENGTH_SHORT).show();
+                    loginBtn.setEnabled(true); // Réactiver le bouton
+                });
             }
         }).start();
     }

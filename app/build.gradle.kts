@@ -45,5 +45,6 @@ dependencies {
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
     implementation("org.osmdroid:osmdroid-android:6.1.18")
     implementation("androidx.preference:preference:1.2.1")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
     // CardView est déjà inclus dans Material, pas besoin de l'ajouter
 }

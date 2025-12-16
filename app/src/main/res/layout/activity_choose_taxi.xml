@@ -1,12 +1,12 @@
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8F9FA"
-    tools:context=".MainActivity">
+    tools:context=".ChooseTaxiActivity">
 
-    <!-- Map -->
     <org.osmdroid.views.MapView
         android:id="@+id/map"
         android:layout_width="0dp"
@@ -16,7 +16,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Search Bar -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/searchCard"
         android:layout_width="0dp"
@@ -55,7 +54,6 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Trip Info Card -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/tripInfoCard"
         android:layout_width="0dp"
@@ -63,7 +61,7 @@
         android:layout_margin="16dp"
         app:cardCornerRadius="24dp"
         app:cardElevation="10dp"
-        app:layout_constraintBottom_toTopOf="@id/btnBookTaxi"
+        app:layout_constraintBottom_toTopOf="@+id/btnBookTaxi"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -109,10 +107,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
+            <Button
+                android:id="@+id/btnConfirmBooking"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Confirmer la réservation du taxi sélectionné"
+                android:backgroundTint="#007AFF"
+                android:textColor="@android:color/white"
+                android:visibility="gone"
+                />
+
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Floating Action Button for Booking -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnBookTaxi"
         android:layout_width="wrap_content"
