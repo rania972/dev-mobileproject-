@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.waslniiii">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -25,7 +26,7 @@
         <meta-data android:name="osmdroid.basePath" android:value="osmdroid"/>
 
         <activity
-            android:name=".MainActivity"
+            android:name=".Acuielle"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,8 +34,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Acuielle" android:exported="false" />
+        <activity android:name=".BusListActivity" android:exported="false" />
         <activity android:name=".SelectionCourse" android:exported="false" />
+        <activity android:name=".MainActivity" android:exported="false" />
+        <activity android:name=".history" android:exported="false" />
 
     </application>
 
