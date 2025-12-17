@@ -1,9 +1,8 @@
 package com.example.waslniiii;
 
 import android.content.Intent;
-import android.content.SharedPreferences; // For local account storage
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -26,37 +25,32 @@ public class MainActivity extends AppCompatActivity {
 
     EditText emailInput, passwordInput;
     Button loginBtn;
-    TextView signupLink; // The "link" to open Sign Up
+    TextView signupLink;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // 1. Initialize Header GIF
         ImageView gifView = findViewById(R.id.gifView);
         Glide.with(this).asGif().load(R.drawable.animations).into(gifView);
 
-        // 2. Initialize Views
         emailInput = findViewById(R.id.et_email);
         passwordInput = findViewById(R.id.et_motpasse);
         loginBtn = findViewById(R.id.button);
         signupLink = findViewById(R.id.tv_go_to_signup);
 
-        // 3. Login Button Logic
         loginBtn.setOnClickListener(v -> {
             if (validateInputs()) {
                 performLogin();
             }
         });
 
-        // 4. Navigate to Sign Up Activity
         signupLink.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, activity_sign_up.class);
             startActivity(intent);
         });
 
-        // 5. Auto-fill if returning from successful Sign Up
         if (getIntent().hasExtra("PREFILL_EMAIL")) {
             emailInput.setText(getIntent().getStringExtra("PREFILL_EMAIL"));
             passwordInput.setText(getIntent().getStringExtra("PREFILL_PASSWORD"));
@@ -67,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         String email = emailInput.getText().toString().trim().toLowerCase();
         String password = passwordInput.getText().toString().trim();
 
-        // ✅ CHECK NEW ACCOUNTS (Saved in SharedPreferences by Sign Up Activity)
+        // 1. CHECK SAVED ACCOUNTS (From Sign Up)
         SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         String savedEmail = prefs.getString("email", "").toLowerCase();
         String savedPw = prefs.getString("password", "");
@@ -78,33 +72,46 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // ✅ KEEP FAKE ACCOUNTS (Your "shortcut" logic)
-        if (email.contains("client") || password.contains("client")) {
+        // 2. SHORTCUT LOGIC (For testing)
+        if (email.contains("client")) {
             handleRedirection("User");
             return;
         }
 
-        if (email.contains("taxi") || password.contains("taxi")) {
+        if (email.contains("taxi")) {
             handleRedirection("Taxi Driver");
             return;
         }
 
-        // ✅ SERVER LOGIN (Fallback to PHP script)
+        // ✅ ADDED: BUS DRIVER SHORTCUT
+        if (email.contains("bus") || email.contains("chauffeur")) {
+            handleRedirection("Bus Driver");
+            return;
+        }
+
+        // 3. SERVER LOGIN
         loginServer(email, password);
     }
 
     private void handleRedirection(String role) {
         Intent intent;
-        // Check if the user is a normal User/Client
+
+        // Redirect based on the role string
         if (role.equalsIgnoreCase("User") || role.equalsIgnoreCase("client")) {
-            Toast.makeText(this, "Bienvenue sur la carte !", Toast.LENGTH_SHORT).show();
-            // Redirects to your Map Activity
+            Toast.makeText(this, "Bienvenue Passager !", Toast.LENGTH_SHORT).show();
             intent = new Intent(MainActivity.this, Acuielle.class);
+
+        } else if (role.equalsIgnoreCase("Bus Driver")) {
+            // ✅ REDIRECT TO YOUR NEW BUS DRIVER ACTIVITY
+            Toast.makeText(this, "Session Chauffeur Bus Active", Toast.LENGTH_SHORT).show();
+            intent = new Intent(MainActivity.this, BusDriverActivity.class);
+
         } else {
-            // Redirects to Driver selection screen
-            Toast.makeText(this, "Bienvenue chauffeur !", Toast.LENGTH_SHORT).show();
+            // Default for Taxi Drivers or others
+            Toast.makeText(this, "Bienvenue chauffeur Taxi !", Toast.LENGTH_SHORT).show();
             intent = new Intent(MainActivity.this, SelectionCourse.class);
         }
+
         startActivity(intent);
         finish();
     }
@@ -117,7 +124,6 @@ public class MainActivity extends AppCompatActivity {
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoOutput(true);
-                conn.setConnectTimeout(10000);
 
                 String data = "email=" + email + "&password=" + password;
                 OutputStream os = conn.getOutputStream();
@@ -137,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
                 String status = json.getString("status");
 
                 if (status.equals("success")) {
+                    // You can check the role from JSON here if your PHP supports it
                     runOnUiThread(() -> handleRedirection("Taxi Driver"));
                 } else {
                     runOnUiThread(() -> {
@@ -147,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
                 runOnUiThread(() -> {
-                    Toast.makeText(MainActivity.this, "Erreur de connexion au serveur", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Erreur serveur", Toast.LENGTH_SHORT).show();
                     loginBtn.setEnabled(true);
                 });
             }
