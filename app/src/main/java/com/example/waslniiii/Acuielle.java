@@ -1,9 +1,12 @@
 package com.example.waslniiii;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,28 +31,59 @@ public class Acuielle extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // ✅ CONFIGURATION OSMDROID (IMPORTANT!)
+        // ✅ CONFIGURATION OSMDROID
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
         Configuration.getInstance().setUserAgentValue(getPackageName());
 
         setContentView(R.layout.acuielle);
 
+        // --- MAP INITIALIZATION ---
         map = findViewById(R.id.map);
-
-        // ✅ Configuration de la carte
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
 
-        // ❌ Masquer les boutons +/-
+        // ❌ Hide Zoom Buttons
         map.setBuiltInZoomControls(false);
         map.getZoomController().setVisibility(
                 org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER
         );
 
-        // ✅ Zoom par défaut
+        // ✅ Set initial zoom level
         map.getController().setZoom(15.0);
 
-        // Vérification permission
+        // --- NAVIGATION LOGIC ---
+
+        // 1. Mon Itinéraire (button10) -> Open RouteActivity
+        Button btnItineraire = findViewById(R.id.button10);
+        btnItineraire.setOnClickListener(v -> {
+            Intent intent = new Intent(Acuielle.this, RouteActivity.class);
+            startActivity(intent);
+        });
+
+        // 2. Trouver un Taxi (button2) -> Open choose_taxi
+        Button btnTrouverTaxi = findViewById(R.id.button2);
+        btnTrouverTaxi.setOnClickListener(v -> {
+            // Updated to use the correct class name for your taxi selection
+            Intent intent = new Intent(Acuielle.this, ChooseTaxiActivity.class);
+            startActivity(intent);
+        });
+
+        // 3. Historique (button8) -> Open history
+        Button btnHistorique = findViewById(R.id.button8);
+        btnHistorique.setOnClickListener(v -> {
+            Intent intent = new Intent(Acuielle.this, history.class);
+            startActivity(intent);
+        });
+
+        // 4. Lignes de Bus (button9) -> Open BusListActivity
+        Button btnBus = findViewById(R.id.button9);
+        btnBus.setOnClickListener(v -> {
+            Intent intent = new Intent(Acuielle.this, BusListActivity.class);
+            startActivity(intent);
+        });
+
+
+        // --- LOCATION PERMISSION CHECK ---
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
@@ -61,7 +95,6 @@ public class Acuielle extends AppCompatActivity {
     }
 
     private void activerLocalisation() {
-        // Overlay de localisation
         locationOverlay = new MyLocationNewOverlay(
                 new GpsMyLocationProvider(this), map);
         locationOverlay.enableMyLocation();
@@ -69,7 +102,6 @@ public class Acuielle extends AppCompatActivity {
 
         map.getOverlays().add(locationOverlay);
 
-        // Centrer sur la position dès qu'elle est trouvée
         locationOverlay.runOnFirstFix(() -> runOnUiThread(() -> {
             IGeoPoint myPos = locationOverlay.getMyLocation();
             if (myPos != null) {
@@ -88,6 +120,8 @@ public class Acuielle extends AppCompatActivity {
                 grantResults.length > 0 &&
                 grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             activerLocalisation();
+        } else {
+            Toast.makeText(this, "Permission de localisation requise pour la carte", Toast.LENGTH_SHORT).show();
         }
     }
 
