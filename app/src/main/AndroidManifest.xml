@@ -19,7 +19,7 @@
         android:theme="@style/Theme.Waslniiii">
 
         <activity
-            android:name=".Acuielle"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,7 +30,7 @@
         <activity android:name=".BusListActivity" android:exported="false" />
         <activity android:name=".activity_sign_up" android:exported="false" />
         <activity android:name=".SelectionCourse" android:exported="false" />
-        <activity android:name="MainActivity" android:exported="false" />
+        <activity android:name=".Acuielle" android:exported="false" />
         <activity android:name=".RouteActivity" android:exported="false" />
         <activity android:name=".history" android:exported="false" />
         <activity android:name=".ChooseTaxiActivity" android:exported="false" />
